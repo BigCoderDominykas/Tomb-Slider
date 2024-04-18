@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 
 public class Player : MonoBehaviour
 {
@@ -13,15 +15,25 @@ public class Player : MonoBehaviour
     public AudioClip collectCoinSound;
     public AudioClip collectStarSound;
 
+    public RuleTile tile;
+    public Tilemap tileMap;
+
+    public string nextLevel;
+
     Rigidbody2D rb;
     AudioSource source;
     Vector2 input = Vector2.right;
     RaycastHit2D hitCopy;
+    Sprite coinSprite;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         source = GetComponent<AudioSource>();
+
+        coinSprite = tile.m_DefaultSprite;
+        tile.m_DefaultSprite = null;
+        tileMap.RefreshAllTiles();
     }
 
     private void Update()
@@ -61,5 +73,14 @@ public class Player : MonoBehaviour
             source.PlayOneShot(collectStarSound);
             Destroy(collision.gameObject);
         }
+        if (collision.gameObject.CompareTag("Finish"))
+        {
+            SceneManager.LoadScene(nextLevel);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        tile.m_DefaultSprite = coinSprite;
     }
 }
